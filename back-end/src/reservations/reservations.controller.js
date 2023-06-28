@@ -9,10 +9,7 @@ async function list(req, res) {
   if (req.query.date){
     const data = await service.list(req.query.date);
     res.json({ data });
-  } else if(req.query.mobile_number){
-    const data = await service.search(req.query.mobile_number);
-    res.json({data});
-  }
+  } 
     else {
     const data = await service.list(today());
     res.json({ data });
@@ -94,6 +91,39 @@ function peopleIsNumber(req, res, next){
   }
   next();
 }
+//checks if restaurant is open(not tuesday)
+function isNotTuesday(req, res, next){
+  const {reservation_date} = req.body.data;
+  const date = reservation_date.split("-");
+  const dateAsNum = new Date(
+    Number(date[0]),
+    Number(date[1]) - 1,
+    Number(date[2]),
+    0,
+    0,
+    1
+  );
+  if(dateAsNum.getDay() === 2){
+    next({ status: 400, message: "I'm sorry. The restaurant is closed on Tuesdays."});
+  } else {
+    next();
+  }
+}
+//checks if reservation has a future date
+function isFutureDate(req, res, next){
+  const {reservation_date, reservation_time} = req.body.data;
+  const [hour, minute] = reservation_time.split(":");
+   let [year, month, day] = reservation_date.split("-");
+   month -= 1;
+   const resDate = new Date(year, month, day, hour, minute, 59, 59).getTime();
+   const today = new Date().getTime();
+
+   if(resDate > today){
+    next();
+   } else {
+    next({ status: 400, message: "Reservation must be set in the future."});
+   }
+};
 
 async function create(req, res){
   const data = await service.create(req.body.data);
@@ -119,8 +149,10 @@ module.exports = {
   create: [hasData, hasValidProperties,
     hasProperties("first_name", "last_name", "mobile_number", "reservation_date", "reservation_time", "people"),
     hasValidDate,
-    hasValidTime,
     peopleIsNumber,
+    hasValidTime,
+    isNotTuesday,
+    isFutureDate,
     asyncErrorBoundary(create)],
   list: [asyncErrorBoundary(list)],
   read: [asyncErrorBoundary(reservationExists),

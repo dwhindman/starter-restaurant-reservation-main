@@ -1,9 +1,9 @@
 const knex = require("../db/connection");
 
-function list(date){
+function list(reservation_date){
     return knex("reservations")
         .select("*")
-        .where({"reservation_date": date} )
+        .where({"reservation_date": reservation_date} )
         .andWhereNot({"status": "finished" })
         .orderBy("reservation_time");
 }
