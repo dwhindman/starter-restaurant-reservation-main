@@ -1,9 +1,9 @@
 const knex = require("../db/connection");
 
-function list(reservation_date){
+function list(date){
     return knex("reservations")
         .select("*")
-        .where({"reservation_date": reservation_date} )
+        .where({"reservation_date": date} )
         .andWhereNot({"status": "finished" })
         .orderBy("reservation_time");
 }
@@ -12,7 +12,7 @@ function create(newReservation){
     return knex("reservations")
         .insert(newReservation)
         .returning("*")
-        .then(createdReservation => createdReservation[0]);
+        .then((createdReservation) => createdReservation[0]);
 }
 
 function read(reservation_id){
@@ -23,8 +23,8 @@ function read(reservation_id){
 }
 
 module.exports = {
-    create,
     list,
+    create,
     read,
     
 }

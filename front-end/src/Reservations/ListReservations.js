@@ -1,7 +1,7 @@
 import React from "react";
 import ReservationCard from "./ReservationCard";
 
-function ListReservations({reservations}){
+function ListReservations({reservations, setReservationsError, loadReservations}){
 
     return (
         reservations.map((reservation) =>
@@ -14,7 +14,9 @@ function ListReservations({reservations}){
                         reservation_date={reservation.date}
                         reservation_time={reservation.reservation_time}
                         people={reservation.people}
-                        status={reservation.status} />
+                        status={reservation.status}
+                        setReservationsError={setReservationsError}
+                        loadReservations={loadReservations} />
                 </div>
     ));
 

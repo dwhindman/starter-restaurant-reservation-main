@@ -8,6 +8,8 @@ function ReservationCard({reservation_id,
     reservation_time,
     people,
     status,
+    setReservationsError,
+    loadReservations
     }){
 
         return (

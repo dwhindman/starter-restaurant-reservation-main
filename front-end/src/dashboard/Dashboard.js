@@ -15,6 +15,15 @@ function Dashboard({ date }) {
 
   useEffect(loadDashboard, [date]);
 
+  function loadReservations(){
+    const abortController = new AbortController();
+    listReservations({ date }, abortController.signal)
+      .then(setReservations)
+      .catch(setReservationsError);
+
+    return () => abortController.abort();
+  }
+
   function loadDashboard() {
     const abortController = new AbortController();
     setReservationsError(null);
@@ -32,7 +41,7 @@ function Dashboard({ date }) {
       </div>
       
       <ErrorAlert error={reservationsError} />
-      <ListReservations reservations={reservations} />
+      <ListReservations reservations={reservations} loadReservations={loadReservations} setReservationsError={setReservationsError} />
       
       <div>
         <button className="btn-primary rounded">Previous</button>
